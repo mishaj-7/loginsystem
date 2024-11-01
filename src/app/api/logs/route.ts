@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from '@/lib/auth';
 import dbConnect from '@/lib/mongodb';
-import Log from '@/models/Log';
+import Log from '../../../../models/Log';
 
 export async function GET(request: NextRequest) {
   try {
