@@ -1,9 +1,7 @@
-
-// src/app/api/auth/register/route.ts
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import  dbConnect from '@/lib/mongodb';
+import dbConnect from '@/lib/mongodb';
 import User from '../../../../../models/User';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
@@ -11,7 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 export async function POST(req: Request) {
   try {
     const { name, email, password } = await req.json();
-
+    
     await dbConnect();
 
     // Check if user already exists
@@ -31,7 +29,7 @@ export async function POST(req: Request) {
       name,
       email,
       password: hashedPassword,
-      role: 'user', // Default role
+      role: 'user',
     });
 
     // Generate JWT token
@@ -43,7 +41,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ token, user: { id: user._id, email: user.email, role: user.role } });
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error('+++++++++++++++', error);
     return NextResponse.json(
       { message: 'Internal server error' },
       { status: 500 }

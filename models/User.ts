@@ -2,10 +2,14 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    username: {
+    name: {  // Retain or modify this to match your needs
       type: String,
       required: true,
-      unique: true,
+    },
+    email: {  // Add this line
+      type: String,
+      required: true,
+      unique: true,  // Ensures that no two users can have the same email
     },
     password: {
       type: String,
@@ -13,7 +17,6 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["admin", "user"],
       default: "user",
     },
   },
