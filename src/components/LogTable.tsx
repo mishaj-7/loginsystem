@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { format } from 'date-fns';
-import { LogEntry } from '@/';
+import { LogEntry } from '../../types/index';
 
 interface LogTableProps {
   initialLogs: LogEntry[];
@@ -46,7 +46,7 @@ export default function LogTable({ initialLogs, onDelete }: LogTableProps) {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {logs.map((log) => (
+            {logs?.map((log) => (
               <tr key={log._id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 

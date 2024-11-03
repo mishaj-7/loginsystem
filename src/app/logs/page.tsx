@@ -1,29 +1,39 @@
-// src/app/logs/page.tsx
 import { Suspense } from 'react';
 import LogTable from '@/components/LogTable';
 import LogFilters from '@/components/LogFilters';
 import { headers } from 'next/headers';
 
-async function getLogs(searchParams: URLSearchParams) {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/logs?${searchParams}`, {
+async function getLogs(searchParams: Record<string, string>) {
+  // Construct the URL with query parameters
+  const url = new URL(`${process.env.NEXT_LOCALURL}/api/logs`);
+  Object.entries(searchParams).forEach(([key, value]) => {
+    url.searchParams.append(key, value);
+  });
+
+  // Fetch the authorization header
+  const authHeader = (await headers()).get('Authorization') || '';
+
+  // Make the API request
+  const response = await fetch(url.toString(), {
     headers: {
-      'Authorization': headers().get('Authorization') || '',
+      'Authorization': authHeader,
     },
   });
-  
+
   if (!response.ok) {
-    throw new Error('Failed to fetch logs');
+    console.log('Failed to fetch logs');
   }
-  
+
   return response.json();
 }
 
 export default async function LogsPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams: Record<string, string>;
 }) {
-  const initialLogs = await getLogs(new URLSearchParams(searchParams as Record<string, string>));
+  // Pass searchParams directly as an object
+  const initialLogs = await getLogs(searchParams);
 
   async function deletelog(id: string) {
     'use server';
@@ -31,12 +41,12 @@ export default async function LogsPage({
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/logs/${id}`, {
       method: 'DELETE',
       headers: {
-        'Authorization': headers().get('Authorization') || '',
+        'Authorization': (await headers()).get('Authorization') || '',
       },
     });
 
     if (!response.ok) {
-      throw new Error('Failed to delete log');
+      console.log('Failed to delete log');
     }
   }
 
