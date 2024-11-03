@@ -1,10 +1,11 @@
-import { NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import dbConnect from '@/lib/mongodb';
-import User from '../../../../../models/User';
+import { NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import dbConnect from "@/lib/mongodb";
+import User from "../../../../../models/User";
+import UserSession from "../../../../../models/UserSession";
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
 export async function POST(req: Request) {
   try {
@@ -16,7 +17,7 @@ export async function POST(req: Request) {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return NextResponse.json(
-        { message: 'User already exists' },
+        { message: "User already exists" },
         { status: 400 }
       );
     }
@@ -29,21 +30,28 @@ export async function POST(req: Request) {
       name,
       email,
       password: hashedPassword,
-      role: 'user',
+      role: "user",
     });
 
     // Generate JWT token
-    const token = jwt.sign(
-      { userId: user._id, role: user.role },
-      JWT_SECRET,
-      { expiresIn: '24h' }
-    );
+    const token = jwt.sign({ userId: user._id, role: user.role }, JWT_SECRET, {
+      expiresIn: "24h",
+    });
 
-    return NextResponse.json({ token, user: { id: user._id, email: user.email, role: user.role } });
+    // Create a session with the token and userId
+    const session = await UserSession.create({
+      userId: user._id,
+      token,
+    });
+
+    return NextResponse.json({
+      session,
+      user: { id: user._id, email: user.email, role: user.role },
+    });
   } catch (error) {
-    console.error('+++++++++++++++', error);
+    console.error("Error in registration:", error);
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { message: "Internal server error" },
       { status: 500 }
     );
   }
